@@ -2,8 +2,6 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 
-from .forms import YamDBUserCreationForm, YamDBUserChangeForm
-
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
