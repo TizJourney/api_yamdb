@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'api',
 ]
 
+# мы используем для модели пользовтеля нашу переопределённую модель
+AUTH_USER_MODEL = 'api.YamDBUser'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
