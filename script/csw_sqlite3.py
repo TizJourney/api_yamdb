@@ -1,41 +1,81 @@
-import csv, sqlite3
+import argparse
+import csv
+import sqlite3
+import sys
 
-name_csv = ''   # название файла csv
-name_model = '' # название модели
-name_app = ''   # название приложения, в котором будут созданы модели
+BASE_DEFAULT_PATH = './data'
 
-headers = [] # объявление заголовка таблицы
+# конфиг отображения таблиц базы данных в csv файлы
+# название для таблицы можно подсмотреть так: python manage.py inspectdb
+TABLE_CONFIG = {
+    'api_yamdbuser': 'users',
+}
 
-con = sqlite3.connect("db.sqlite3")
-cur = con.cursor()
+def prepare_db_data(filename):
+    with open(filename, 'r', encoding='utf8') as read_csv:
+        # csv.DictReader использует первую строку в файле для header
+        # запятая - разделитель по умолчанию
+        dr = csv.DictReader(read_csv)
 
-# --эта часть кода для проверки работы-- 
-# (при созданных моделях не использовать!)
-with open(f'data/{name_csv}.csv', 'r', encoding='utf8') as read_csv:
-    dr = csv.DictReader(read_csv)
-    headers = dr.fieldnames
-cur.execute(f"CREATE TABLE {name_app}_{name_model} {tuple(headers)};")
-# --------------------------------------
+        # строим соответствие имён в данных и модели
+        # и фильтруем по поляем, которые хотим использовать
+        database_fields = dr.fieldnames
+        database_data = []
+        for row in dr:
+            database_data.append(
+                [
+                    row[row_key] for row_key in database_fields
+                ]
+            )
+    return database_fields, database_data
 
-with open(f'data/{name_csv}.csv', 'r', encoding='utf8') as read_csv:
-    # csv.DictReader использует первую строку в файле для header
-    # запятая - разделитель по умолчанию
-    dr = csv.DictReader(read_csv)
-    headers = dr.fieldnames
-    to_db = []
-    for i in dr:
-        row = []
-        for key_i in headers:
-            row.append(i[key_i])
-        to_db.append(row)
 
-count_headers = len(headers) # количество столбцов
-str_q = '?, ' * (count_headers - 1) + '?'
+def main(options):
+    cur = None
 
-cur.executemany(
-    f"INSERT INTO {name_app}_{name_model} {tuple(headers)} VALUES ({str_q});",
-    to_db
-)
+    if not options.dummy:
+        con = sqlite3.connect(options.database)
+        cur = con.cursor()
+    else:
+        print(f'Открываем базу {options.database}')
+    
+    for key, filename in TABLE_CONFIG.items():
+        print(f'Запуск скрипта для {key}')
+        full_path = f'{options.data}/{filename}.csv'
+        headers, data = prepare_db_data(full_path)
+        str_q =  ','.join('?' * len(headers))
+        
+        # добавляем запись(INSERT) или пропускаем(IGNORE), если она уже есть в базе данных
+        command = f'INSERT OR IGNORE INTO {key} {tuple(headers)} VALUES ({str_q})'
+        if not options.dummy:
+            cur.executemany(command, data)
+        else:
+            # поддержка режима холостого запуска
+            # вместо запуска команд просто печатаем их на экран            
+            print(command)
+            for item in data:
+                print(item)
 
-con.commit()
-con.close()
+    if not options.dummy:
+        con.commit()
+        con.close()
+    else:
+        print(f'Закрываем базу')
+
+def parse_arguments(args):
+    parser = argparse.ArgumentParser(
+        description='Скрипт для заливки данных в тестовую базу данных из csv файлов')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        '--dummy', help='Режим холостого запуска', action='store_true')
+    parser.add_argument(
+        '--database', help='Путь до базы данных для заливки данных. По умолчанию: db.sqlite3', default='db.sqlite3')
+    parser.add_argument(
+        '-d', '--data', help=f'Путь до данных с файлами. По умолчанию {BASE_DEFAULT_PATH}', default=BASE_DEFAULT_PATH)
+
+
+    return parser.parse_args()
+
+if __name__ == "__main__":
+    options = parse_arguments(sys.argv)
+    main(options)
