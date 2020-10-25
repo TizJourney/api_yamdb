@@ -44,3 +44,18 @@ curl --location --request POST 'http://127.0.0.1:8000/api/v1/posts/1/comments/' 
 --header 'Authorization: Bearer <тут access токен>' \
 --form 'text=Какой-то текст поста'
 ```
+
+
+### Если возникнет ошибка ```migration admin.0001_initial```
+
+* Закомментировать в settings.py в `INSTALLED_APPS` строчку `api` и `AUTH_USER_MODEL = 'api.YamDBUser'`
+
+* Обнулить миграции пользователей 
+```
+python manage.py migrate admin zero
+python manage.py migrate auth zero
+python manage.py migrate contenttypes zero
+python manage.py migrate sessions zero
+```
+* Расскомменитировать строчки выше
+* Сделать миграцию: `python manage.py migrate`
