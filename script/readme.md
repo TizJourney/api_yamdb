@@ -1,5 +1,5 @@
 ## Инструкция по запуску
-* `python ./script/csw_sqlite3.py`
+* `./script/csw_sqlite3.py`
 * Запускать из корневой папки (там где лежит `manage.py`)
 
 ## Запуск скрипта из другой папки
@@ -7,10 +7,10 @@
 * Запуск из директории со скриптом: `python csw_sqlite3.py --data ../data --database ../db.sqlite3`
 
 ### Помощь и описание всех опций
-* `python ./script/csw_sqlite3.py --help`
+* `./script/csw_sqlite3.py --help`
 
 ### Режим холостого запуска
-* `python ./script/csw_sqlite3.py --dummy`
+* `./script/csw_sqlite3.py --dummy`
 * Вместо редактирования базы данных печатает команды и данные на экран
 
 ## Краткая инструкция
