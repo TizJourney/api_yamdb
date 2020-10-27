@@ -13,9 +13,7 @@ router.register(r'users', views.UsersViewSet)
 
 v1_url_patterns = [
     path('auth/mail/', views.auth_send_email, name='auth_send_mail'),
-    # это заглушки для проверки правильности подключения jwt-токенов. Ближайшее время будут убраны.
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/token/', views.auth_get_token, name='auth_get_token'),
 ]
 
 urlpatterns = [

@@ -17,5 +17,15 @@ class UserSerializer(serializers.ModelSerializer):
         )
         model = User
 
+
 class EmailAuthSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
+
+
+class EmailAuthTokenInputSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+
+class EmailAuthTokenOutputSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
