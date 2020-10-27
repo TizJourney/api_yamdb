@@ -14,8 +14,7 @@ User = get_user_model()
 class UsersViewSet(viewsets.ModelViewSet):
     # пользователи доложны сначала пройти актавацию через e-mail
     # прежде, чем будут признаны настоящими
-    # queryset = User.objects.filter(is_active=True)
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
 
 
