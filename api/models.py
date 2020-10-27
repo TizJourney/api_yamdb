@@ -17,3 +17,12 @@ class YamDBUser(AbstractUser):
         choices=ROLE_CHOICES,
         default='user'
     )
+
+    def __str__(self):
+        if self.username:
+            name = f'{self.username}:{self.email}'
+        else:
+            name = self.email
+        return name
+
+
