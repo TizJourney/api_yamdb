@@ -9,7 +9,6 @@ from .serializers import (
 )
 from django.core.mail import send_mail
 from rest_framework import response, status
-from django.views.decorators.csrf import csrf_exempt
 from smtplib import SMTPException
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import get_object_or_404
@@ -32,7 +31,6 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
-@csrf_exempt
 @decorators.api_view(['POST'])
 def auth_send_email(request):
     input_data = EmailAuthSerializer(data=request.data)
@@ -69,7 +67,6 @@ def auth_send_email(request):
     return response.Response(input_data.data, status=status.HTTP_200_OK)
 
 
-@csrf_exempt
 @decorators.api_view(['POST'])
 def auth_get_token(request):
     input_data = EmailAuthTokenInputSerializer(data=request.data)
