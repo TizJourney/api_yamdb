@@ -15,3 +15,6 @@ class UserSerializer(serializers.ModelSerializer):
             'role'
         )
         model = User
+
+class EmailAuthSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
