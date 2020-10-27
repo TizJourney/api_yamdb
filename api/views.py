@@ -13,10 +13,16 @@ from django.views.decorators.csrf import csrf_exempt
 from smtplib import SMTPException
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import get_object_or_404
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
 token_generator = PasswordResetTokenGenerator()
+
+
+def _get_token_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return str(refresh.access_token)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
@@ -83,7 +89,7 @@ def auth_get_token(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    token = 0
+    token = _get_token_for_user(user_object)
 
     output_data = EmailAuthTokenOutputSerializer(data={'token': token})
     if not output_data.is_valid():
