@@ -55,4 +55,4 @@ def auth_send_email(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    return response.Response(status=status.HTTP_200_OK)
+    return response.Response(input_data.data, status=status.HTTP_200_OK)
