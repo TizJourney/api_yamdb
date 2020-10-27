@@ -56,7 +56,7 @@ def auth_send_email(request):
         send_mail(
             'Получение доступа к социальной сети YamDB',
             f'Ваш код активации: {confirmation_code}',
-            None,
+            None, # from: использовать DEFAULT_FROM_EMAIL
             [email],
             fail_silently=False,
         )
