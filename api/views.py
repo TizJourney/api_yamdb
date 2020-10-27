@@ -25,8 +25,8 @@ def _get_token_for_user(user):
 
 
 class UsersViewSet(viewsets.ModelViewSet):
-    # пользователи доложны сначала пройти актавацию через e-mail
-    # прежде, чем будут признаны настоящими
+    # is_active: пользователи должны сначала пройти активацию через e-mail
+    # прежде, чем получат доступ в социальную сеть
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
 
