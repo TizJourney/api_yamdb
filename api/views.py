@@ -17,6 +17,8 @@ User = get_user_model()
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    # потом будем посылать только активных пользователей
+    # queryset = User.objects.filter(is_active=True)
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -32,6 +34,11 @@ def auth_send_email(request):
         )
 
     email = input_data.validated_data['email']
-    
+
+    user_object, created = User.objects.get_or_create(email=email)
+
+    if created:
+        user_object.is_active = False
+        user_object.save()
 
     return response.Response(status=status.HTTP_200_OK)
