@@ -12,7 +12,8 @@ class UserSerializer(serializers.ModelSerializer):
             'username',
             'bio',
             'email',
-            'role'
+            'role',
+            'is_active'
         )
         model = User
 

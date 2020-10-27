@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# это наш виртуальный почтовый ящик, от имени которого посылаются e-mail'ы
+DEFAULT_FROM_EMAIL = 'admin@yamdb.com'
 
 # Application definition
 
