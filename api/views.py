@@ -86,6 +86,10 @@ def auth_get_token(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    if not user_object.is_active:
+        user_object.is_active = True
+        user_object.save()
+
     token = _get_token_for_user(user_object)
 
     output_data = EmailAuthTokenOutputSerializer(data={'token': token})
