@@ -13,7 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
             'bio',
             'email',
             'role',
-            'is_active'
         )
         model = User
 
