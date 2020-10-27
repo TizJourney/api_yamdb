@@ -28,9 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-# это наш виртуальный почтовый ящик, от имени которого посылаются e-mail'ы
-DEFAULT_FROM_EMAIL = 'admin@yamdb.com'
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -145,9 +142,13 @@ REST_FRAMEWORK = {
     ],
 }
 
+# это наш виртуальный почтовый ящик, от имени которого посылаются e-mail'ы
+DEFAULT_FROM_EMAIL = 'admin@yamdb.com'
+
 # настройка посылки e-mail: используем "файловую" посылку. по сути эмуляция
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
+

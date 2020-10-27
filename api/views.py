@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from rest_framework import response, status
 from django.views.decorators.csrf import csrf_exempt
 from smtplib import SMTPException
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 User = get_user_model()
 
@@ -37,12 +38,13 @@ def auth_send_email(request):
         user_object.is_active = False
         user_object.save()
 
-    confirmation_code = 0
+    token_generator = PasswordResetTokenGenerator()
+    confirmation_code = token_generator.make_token(user_object)        
 
     try:
         send_mail(
             'Получение доступа к социальной сети YamDB',
-            f'Ваш код активации {0}',
+            f'Ваш код активации: {confirmation_code}',
             None,
             [email],
             fail_silently=False,
