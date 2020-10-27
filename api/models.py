@@ -6,16 +6,24 @@ ROLE_CHOICES = (
     ('moderator', 'Модератор'),
     ('admin', 'Администратор'),
 )
-ROLE_MAX_LENGTH = max((len(r[0]) for r in ROLE_CHOICES))
+
 
 
 class YamDBUser(AbstractUser):
-    email = models.EmailField(unique=True)
+    class Role(models.TextChoices):
+        USER = 'user', 'Пользователь'
+        MODERATOR = 'moderator', 'Модератор'
+        ADMIN = 'admin', 'Администратор'
+    ROLE_MAX_LENGTH = max((len(c[0]) for c in Role.choices))
+    
+    # нельзя заводить с пустой почтой
+    # каждый пользователь должен иметь уникальную почту
+    email = models.EmailField(unique=True, blank=False)
     bio = models.TextField(blank=True)
     role = models.CharField(
-        max_length=ROLE_MAX_LENGTH,
-        choices=ROLE_CHOICES,
-        default='user'
+        max_length = ROLE_MAX_LENGTH,
+        choices=Role.choices,
+        default=Role.USER,
     )
 
     def __str__(self):
