@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from . import models
+
 User = get_user_model()
 
 
@@ -28,3 +30,34 @@ class EmailAuthTokenInputSerializer(serializers.Serializer):
 
 class EmailAuthTokenOutputSerializer(serializers.Serializer):
     token = serializers.CharField(required=True)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username', read_only=True
+    )
+    
+    class Meta:
+        fields = (
+            'id',
+            'text',
+            'author',
+            'score',
+            'pub_date'
+        )
+        model = models.Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username', read_only=True
+    )
+    
+    class Meta:
+        fields = (
+            'id',
+            'text',
+            'author',
+            'pub_date'
+        )
+        model = models.Comment

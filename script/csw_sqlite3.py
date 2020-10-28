@@ -18,6 +18,9 @@ BASE_DEFAULT_PATH = './data'
 # название для таблицы можно подсмотреть так: python manage.py inspectdb
 TABLE_CONFIG = {
     'api_yamdbuser': 'users',
+    'api_title': 'titles',
+    'api_review': 'review',
+    'api_comment': 'comments',
 }
 
 def prepare_db_data(filename):

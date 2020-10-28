@@ -10,6 +10,16 @@ from rest_framework_simplejwt.views import (
 
 router = DefaultRouter()
 router.register(r'users', views.UsersViewSet)
+router.register(
+    r'titles/(?P<title_id>\d+)/reviews',
+    views.ReviewViewSet,
+    basename="reviews"
+)
+router.register(
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    views.CommentViewSet,
+    basename="comments"
+)
 
 v1_url_patterns = [
     path('auth/mail/', views.auth_send_email, name='auth_send_mail'),

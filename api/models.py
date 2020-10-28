@@ -26,3 +26,61 @@ class YamDBUser(AbstractUser):
         return name
 
 
+class Title(models.Model):
+    name = models.CharField(max_length=200)
+    year = models.IntegerField()
+    category = models.SlugField(blank=False)
+
+    def __str__(self):
+        title = f'Произведение {self.name}'
+        return title
+
+
+class Review(models.Model):
+    title = models.ForeignKey(Title,
+                              on_delete=models.CASCADE,
+                              related_name='reviews',
+                              verbose_name='Произведение')
+    text = models.TextField('Текст отзыва')
+    author = models.ForeignKey(YamDBUser,
+                               on_delete=models.CASCADE,
+                               related_name='reviews',
+                               verbose_name='Автор',
+                               db_column='author')
+    score = models.IntegerField('Рейтинг')
+    pub_date = models.DateTimeField('Дата публикации',
+                                    auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        ordering = ['-pub_date', ]
+    
+    def __str__(self):
+        review = f'Отзыв {self.author} на {self.title}'
+        return review
+
+
+class Comment(models.Model):
+    review = models.ForeignKey(Review,
+                               on_delete=models.CASCADE,
+                               related_name='comments',
+                               verbose_name='Отзыв')
+    text = models.TextField('Текст комментария')
+    author = models.ForeignKey(YamDBUser,
+                               on_delete=models.CASCADE,
+                               related_name='comments',
+                               verbose_name='Автор',
+                               db_column='author')
+    pub_date = models.DateTimeField('Дата добавления',
+                                    auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-pub_date', ]
+    
+    def __str__(self):
+        fragment = str(self.text)[:20]
+        comment = f'Комментарий {self.author} с текстом {fragment}'
+        return comment
