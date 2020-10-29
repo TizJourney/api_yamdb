@@ -7,6 +7,16 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    def validate_username(self, value):
+        if value.startswith(User.AUTO_CREATE_USERNAME_PREFIX):
+            raise serializers.ValidationError(
+                (
+                    'Имя не должно начинаться с '
+                    f'{User.AUTO_CREATE_USERNAME_PREFIX}'
+                )
+            )
+        return value
+
     class Meta:
         fields = (
             'first_name',
@@ -36,7 +46,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username', read_only=True
     )
-    
+
     class Meta:
         fields = (
             'id',
@@ -52,7 +62,7 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username', read_only=True
     )
-    
+
     class Meta:
         fields = (
             'id',

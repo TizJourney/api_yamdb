@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import uuid
+
 
 class YamDBUser(AbstractUser):
     class Role(models.TextChoices):
@@ -7,13 +9,14 @@ class YamDBUser(AbstractUser):
         MODERATOR = 'moderator', 'Модератор'
         ADMIN = 'admin', 'Администратор'
     ROLE_MAX_LENGTH = max((len(c[0]) for c in Role.choices))
-    
+    AUTO_CREATE_USERNAME_PREFIX = 'yamdbuser-'
+
     # нельзя заводить с пустой почтой
     # каждый пользователь должен иметь уникальную почту
     email = models.EmailField(unique=True, blank=False)
     bio = models.TextField(blank=True)
     role = models.CharField(
-        max_length = ROLE_MAX_LENGTH,
+        max_length=ROLE_MAX_LENGTH,
         choices=Role.choices,
         default=Role.USER,
     )
@@ -27,6 +30,17 @@ class YamDBUser(AbstractUser):
         else:
             name = self.email
         return name
+
+# если при создании пользователя не задан username, то
+# то создаём уникальное имя
+def random_username(sender, instance, **kwargs):
+    if not instance.username:
+        unique_username = (
+            f'{YamDBUser.AUTO_CREATE_USERNAME_PREFIX}'
+            f'{uuid.uuid4().hex[:10]}'
+        )
+        instance.username = unique_username
+models.signals.pre_save.connect(random_username, sender=YamDBUser)
 
 
 class Title(models.Model):
@@ -58,7 +72,7 @@ class Review(models.Model):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         ordering = ['-pub_date', ]
-    
+
     def __str__(self):
         review = f'Отзыв {self.author} на {self.title}'
         return review
@@ -82,7 +96,7 @@ class Comment(models.Model):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         ordering = ['-pub_date', ]
-    
+
     def __str__(self):
         fragment = str(self.text)[:20]
         comment = f'Комментарий {self.author} с текстом {fragment}'
