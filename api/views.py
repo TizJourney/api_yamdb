@@ -35,6 +35,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminOrReadOnly]
+    lookup_field = 'username'
 
 
 @decorators.api_view(['POST'])
