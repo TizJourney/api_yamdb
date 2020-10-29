@@ -35,19 +35,6 @@
 
 ### Авторизация
 * В проекте используется [Signature JWT](https://jwt.io/introduction/)
-* Пример запроса на авторизацию для виртуального сервера `http://127.0.0.1:8000`:
-```
-curl --location --request POST 'http://127.0.0.1:8000/api/v1/token/' \
---form 'username=логин' \
---form 'password=пароль'
-```
-* Пример запроса для создания поста API с использованием токена авторизации:
-```
-curl --location --request POST 'http://127.0.0.1:8000/api/v1/posts/1/comments/' \
---header 'Authorization: Bearer <тут access токен>' \
---form 'text=Какой-то текст поста'
-```
-
 
 ### Если возникнет ошибка ```migration admin.0001_initial```
 
