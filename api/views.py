@@ -10,11 +10,12 @@ from .serializers import (
     UserSerializer
 )
 from django.core.mail import send_mail
-from rest_framework import response, status
+from rest_framework import response, status, permissions
 from smtplib import SMTPException
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
+from .permissions import AdminOnly
 
 from .models import Comment, Review, Title
 
@@ -33,6 +34,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     # прежде, чем получат доступ в социальную сеть
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, AdminOnly]
 
 
 @decorators.api_view(['POST'])
@@ -58,7 +60,7 @@ def auth_send_email(request):
         send_mail(
             'Получение доступа к социальной сети YamDB',
             f'Ваш код активации: {confirmation_code}',
-            None, # from: использовать DEFAULT_FROM_EMAIL
+            None,  # from: использовать DEFAULT_FROM_EMAIL
             [email],
             fail_silently=False,
         )
@@ -112,7 +114,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.reviews.all()
-    
+
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         serializer.save(
@@ -123,11 +125,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    
+
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
         return review.comments.all()
-    
+
     def perform_create(self, serializer):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
         serializer.save(
