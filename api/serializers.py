@@ -8,6 +8,9 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('Запрещено использовать имя me')
+
         if value.startswith(User.AUTO_CREATE_USERNAME_PREFIX):
             raise serializers.ValidationError(
                 (
