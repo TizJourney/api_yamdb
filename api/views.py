@@ -15,7 +15,7 @@ from smtplib import SMTPException
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
-from .permissions import AdminOnly
+from .permissions import IsAdminOrReadOnly
 
 from .models import Comment, Review, Title
 
@@ -34,7 +34,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     # прежде, чем получат доступ в социальную сеть
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrReadOnly]
 
 
 @decorators.api_view(['POST'])
