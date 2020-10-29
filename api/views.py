@@ -7,7 +7,8 @@ from .serializers import (
     EmailAuthTokenInputSerializer,
     EmailAuthTokenOutputSerializer,
     ReviewSerializer,
-    UserSerializer
+    UserSerializer,
+    RestrictedUserSerializer,
 )
 from django.core.mail import send_mail
 from rest_framework import response, status, permissions
@@ -39,12 +40,26 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     @decorators.action(
         detail=False,
-        methods=['get', 'post'],
+        methods=['get', 'patch'],
         permission_classes=[permissions.IsAuthenticated]
     )
     def me(self, request, pk=None):
         user_object = get_object_or_404(User, username=request.user.username)
-        serializer = UserSerializer(user_object)
+        if request.method == 'GET':
+            serializer = UserSerializer(user_object)
+            return response.Response(serializer.data)
+        # PATCH
+        serializer = RestrictedUserSerializer(
+            user_object,
+            data=request.data,
+            partial=True
+        )
+        if not serializer.is_valid():
+            return response.Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
         return response.Response(serializer.data)
 
 
