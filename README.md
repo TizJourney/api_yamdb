@@ -33,7 +33,6 @@
 * В проекте используется [Signature JWT](https://jwt.io/introduction/)
 * Авторзация работает через e-mail в 3 шага:
 1. сначала делаете `POST` запрос на `/api/v1/auth/mail/` с полем `email`:
-пример: 
 ```
 curl --location --request POST 'http://127.0.0.1:8000/api/v1/auth/mail/' \
 --form 'email=example@email.com'
@@ -42,7 +41,7 @@ curl --location --request POST 'http://127.0.0.1:8000/api/v1/auth/mail/' \
 3. Делаете `POST` запрос на `/api/v1/auth/token/` с полями `email` и `confirmation_code` и в ответ получаете токен
 ```
 curl --location --request POST 'http://127.0.0.1:8000/api/v1/auth/token/' \
---form 'email=kostya.bondar@gmail.com' \
+--form 'email=example@email.com' \
 --form 'confirmation_code=5l5-1095457590921979885c'
 ```
 * email и прочую релеватную информацию в отсуствие доступа до api можно посмотреть в админке: 'http://127.0.0.1:8000/admin'
