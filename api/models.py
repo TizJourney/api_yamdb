@@ -18,6 +18,9 @@ class YamDBUser(AbstractUser):
         default=Role.USER,
     )
 
+    class Meta:
+        ordering = ('-date_joined', )
+
     def __str__(self):
         if self.username:
             name = f'{self.username}:{self.email}'
