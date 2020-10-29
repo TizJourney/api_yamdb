@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, decorators
+from rest_framework import viewsets, decorators, filters    
 from .serializers import (
     CommentSerializer,
     EmailAuthSerializer,
@@ -37,6 +37,8 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, AdminOnly]
     lookup_field = 'username'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = (['username'])
 
     @decorators.action(
         detail=False,
