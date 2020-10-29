@@ -37,6 +37,16 @@ class UsersViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, AdminOnly]
     lookup_field = 'username'
 
+    @decorators.action(
+        detail=False,
+        methods=['get', 'post'],
+        permission_classes=[permissions.IsAuthenticated]
+    )
+    def me(self, request, pk=None):
+        user_object = get_object_or_404(User, username=request.user.username)
+        serializer = UserSerializer(user_object)
+        return response.Response(serializer.data)
+
 
 @decorators.api_view(['POST'])
 def auth_send_email(request):
@@ -100,12 +110,6 @@ def auth_get_token(request):
     token = _get_token_for_user(user_object)
 
     output_data = EmailAuthTokenOutputSerializer(data={'token': token})
-    if not output_data.is_valid():
-        return response.Response(
-            output_data.errors,
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
     return response.Response(output_data.data, status=status.HTTP_200_OK)
 
 
