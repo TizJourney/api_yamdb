@@ -10,3 +10,15 @@ class AdminOnly(permissions.BasePermission):
             request.user.is_superuser or
             request.user.role == User.Role.ADMIN
         )
+
+
+class IsUserOrModerator(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if obj.author == request.user:
+            return True
+        return (
+            request.method == 'DELETE' and
+            request.user.role == User.Role.MODERATOR
+        )
