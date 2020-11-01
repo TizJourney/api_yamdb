@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
         model = User
 
+
 # специальный сериализатор с ограничениями на изменение полей:
 # нельзя менять роль
 class RestrictedUserSerializer(UserSerializer):
@@ -87,3 +88,9 @@ class CommentSerializer(serializers.ModelSerializer):
             'pub_date'
         )
         model = models.Comment
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = models.Title

@@ -10,6 +10,7 @@ from rest_framework_simplejwt.views import (
 
 router = DefaultRouter()
 router.register(r'users', views.UsersViewSet)
+router.register(r'titles', views.TitleViewSet, basename='posts')
 router.register(
     r'titles/(?P<title_id>\d+)/reviews',
     views.ReviewViewSet,

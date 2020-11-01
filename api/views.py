@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, decorators, filters    
+from rest_framework import viewsets, decorators, filters
 from .serializers import (
     CommentSerializer,
     EmailAuthSerializer,
@@ -9,6 +9,7 @@ from .serializers import (
     ReviewSerializer,
     UserSerializer,
     RestrictedUserSerializer,
+    TitleSerializer,
 )
 from django.core.mail import send_mail
 from rest_framework import response, status, permissions
@@ -158,3 +159,14 @@ class CommentViewSet(viewsets.ModelViewSet):
             author=self.request.user,
             review=review
         )
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    serializer_class = TitleSerializer
+
+    def get_queryset(self):
+        title = Title.objects.all()
+        return title
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
