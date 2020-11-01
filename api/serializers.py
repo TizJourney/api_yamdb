@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
         model = User
 
+
 # специальный сериализатор с ограничениями на изменение полей:
 # нельзя менять роль
 class RestrictedUserSerializer(UserSerializer):
@@ -89,10 +90,9 @@ class CommentSerializer(serializers.ModelSerializer):
         )
         model = models.Comment
 
-# !!!!!!не проходило тесты без этого
+
 class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True, required=False, default=0)
     class Meta:
         fields = '__all__'
         model = models.Title
-# !!!!!!не проходило тесты без этого
