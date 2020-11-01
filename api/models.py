@@ -8,6 +8,7 @@ class YamDBUser(AbstractUser):
         USER = 'user', 'Пользователь'
         MODERATOR = 'moderator', 'Модератор'
         ADMIN = 'admin', 'Администратор'
+
     ROLE_MAX_LENGTH = max((len(c[0]) for c in Role.choices))
     AUTO_CREATE_USERNAME_PREFIX = 'yamdbuser-'
 
@@ -22,7 +23,7 @@ class YamDBUser(AbstractUser):
     )
 
     class Meta:
-        ordering = ('-date_joined', )
+        ordering = ('-date_joined',)
 
     def __str__(self):
         if self.username:
@@ -30,6 +31,7 @@ class YamDBUser(AbstractUser):
         else:
             name = self.email
         return name
+
 
 # если при создании пользователя не задан username, то
 # то создаём уникальное имя
@@ -40,13 +42,39 @@ def random_username(sender, instance, **kwargs):
             f'{uuid.uuid4().hex[:10]}'
         )
         instance.username = unique_username
+
+
 models.signals.pre_save.connect(random_username, sender=YamDBUser)
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=40, unique=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Genre(models.Model):
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=40, unique=True, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Title(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField()
-    category = models.SlugField(blank=False)
+    description = models.TextField(max_length=2000, blank=True, null=True)
+    genre = models.ForeignKey(Genre, blank=True, null=True,
+                              on_delete=models.SET_NULL,
+                              verbose_name="Жанр",
+                              related_name="titles")
+    category = models.ForeignKey(Category, blank=True, null=True,
+                                 on_delete=models.SET_NULL,
+                                 verbose_name="Категория",
+                                 related_name="titles")
 
     def __str__(self):
         title = f'Произведение {self.name}'
