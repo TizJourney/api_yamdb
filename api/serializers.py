@@ -127,3 +127,4 @@ class CreateTitleSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = models.Title
+        read_only_fields = ['genre', 'category']
