@@ -1,26 +1,23 @@
-from django.shortcuts import render
-from django.contrib.auth import get_user_model
-from django.db.models import Avg
-from rest_framework import viewsets, decorators, filters    
-from .serializers import (
-    CommentSerializer,
-    EmailAuthSerializer,
-    EmailAuthTokenInputSerializer,
-    EmailAuthTokenOutputSerializer,
-    ReviewSerializer,
-    UserSerializer,
-    RestrictedUserSerializer,
-    TitleSerializer
-)
-from django.core.mail import send_mail
-from rest_framework import exceptions, response, status, permissions
 from smtplib import SMTPException
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import RefreshToken
-from .permissions import AdminOnly, IsUserOrModerator
 
-from .models import Comment, Review, Title
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404, render
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import (decorators, filters, permissions, response, status,
+                            viewsets, generics)
+from rest_framework.pagination import PageNumberPagination
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import Category, Comment, Genre, Review, Title
+from .permissions import AdminOnly, AdminOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          CreateTitleSerializer, EmailAuthSerializer,
+                          EmailAuthTokenInputSerializer,
+                          EmailAuthTokenOutputSerializer, GenreSerializer,
+                          RestrictedUserSerializer, ReviewSerializer,
+                          TitleSerializer, UserSerializer)
 
 User = get_user_model()
 
@@ -177,12 +174,36 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
 
+class GenreViewSet(generics.ListCreateAPIView):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (AdminOrReadOnly,)
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ("name",)
+    lookup_field = "slug"
+
+
+class CategoryViewSet(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (AdminOrReadOnly,)
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ("name",)
+    lookup_field = "slug"
+
+
 class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
+    permission_classes = (AdminOrReadOnly,)
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_fields = ("category", "genre")
+    search_fields = ("name", "year")
 
-    def get_queryset(self):
-        title = Title.objects.annotate(rating=Avg('reviews__score'))
-        return title
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateTitleSerializer
+        return TitleSerializer
