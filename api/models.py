@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 import uuid
 
@@ -92,7 +93,9 @@ class Review(models.Model):
                                related_name='reviews',
                                verbose_name='Автор',
                                db_column='author')
-    score = models.IntegerField('Рейтинг')
+    score = models.PositiveIntegerField('Рейтинг',
+                                        default=1,
+                                        validators=[MinValueValidator(1), MaxValueValidator(10)])
     pub_date = models.DateTimeField('Дата публикации',
                                     auto_now_add=True)
 

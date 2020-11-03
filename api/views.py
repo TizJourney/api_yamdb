@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, decorators, filters
+from django.db.models import Avg
+from rest_framework import viewsets, decorators, filters    
 from .serializers import (
     CommentSerializer,
     EmailAuthSerializer,
@@ -12,12 +13,12 @@ from .serializers import (
     TitleSerializer,
 )
 from django.core.mail import send_mail
-from rest_framework import response, status, permissions
+from rest_framework import exceptions, response, status, permissions
 from smtplib import SMTPException
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
-from .permissions import AdminOnly
+from .permissions import AdminOnly, IsUserOrModerator
 
 from .models import Comment, Review, Title
 
@@ -133,6 +134,10 @@ def auth_get_token(request):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsUserOrModerator
+    ]
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -140,6 +145,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        if Review.objects.filter(author=self.request.user, title_id=title).exists():
+            raise exceptions.ValidationError('Отзыв уже существует')
         serializer.save(
             author=self.request.user,
             title=title
@@ -148,6 +155,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsUserOrModerator
+    ]
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
@@ -160,12 +171,11 @@ class CommentViewSet(viewsets.ModelViewSet):
             review=review
         )
 
-
 class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
 
     def get_queryset(self):
-        title = Title.objects.all()
+        title = Title.objects.all().annotate(rating=Avg('reviews__score'))
         return title
 
     def perform_create(self, serializer):

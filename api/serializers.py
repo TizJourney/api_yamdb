@@ -73,6 +73,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             'pub_date'
         )
         model = models.Review
+        extra_kwargs = {'title': {'required': False}}
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -89,8 +90,8 @@ class CommentSerializer(serializers.ModelSerializer):
         )
         model = models.Comment
 
-
 class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(read_only=True, required=False, default=0)
     class Meta:
         fields = '__all__'
         model = models.Title
