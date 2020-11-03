@@ -21,6 +21,8 @@ TABLE_CONFIG = {
     'api_title': 'titles',
     'api_review': 'review',
     'api_comment': 'comments',
+    'api_category': 'category',
+    'api_genre': 'genre',
 }
 
 def prepare_db_data(filename):

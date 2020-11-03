@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
         model = User
 
+
 # специальный сериализатор с ограничениями на изменение полей:
 # нельзя менять роль
 class RestrictedUserSerializer(UserSerializer):
