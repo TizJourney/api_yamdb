@@ -8,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (decorators, filters, permissions, response, status,
                             viewsets, generics, mixins)
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ViewSetMixin, GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -187,7 +188,7 @@ class MixinSet(
 class CategoryViewSet(MixinSet):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, AdminOnly]
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
@@ -197,7 +198,7 @@ class CategoryViewSet(MixinSet):
 class GenreViewSet(MixinSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, AdminOnly]
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
@@ -206,7 +207,7 @@ class GenreViewSet(MixinSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, AdminOnly]
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filter_fields = ("category", "genre")
