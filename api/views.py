@@ -1,26 +1,25 @@
-from django.shortcuts import render
-from django.contrib.auth import get_user_model
-from django.db.models import Avg
-from rest_framework import viewsets, decorators, filters    
-from .serializers import (
-    CommentSerializer,
-    EmailAuthSerializer,
-    EmailAuthTokenInputSerializer,
-    EmailAuthTokenOutputSerializer,
-    ReviewSerializer,
-    UserSerializer,
-    RestrictedUserSerializer,
-    TitleSerializer
-)
-from django.core.mail import send_mail
-from rest_framework import exceptions, response, status, permissions
 from smtplib import SMTPException
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import RefreshToken
-from .permissions import AdminOnly, IsUserOrModerator
 
-from .models import Comment, Review, Title
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404, render
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import (decorators, filters, permissions, response, status,
+                            viewsets, generics, mixins)
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ViewSetMixin, GenericViewSet
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import Category, Comment, Genre, Review, Title
+from .permissions import AdminOnly, IsAdminOrReadOnly
+from .serializers import (CategoriesSerializer, CommentSerializer,
+                          CreateTitleSerializer, EmailAuthSerializer,
+                          EmailAuthTokenInputSerializer,
+                          EmailAuthTokenOutputSerializer, GenreSerializer,
+                          RestrictedUserSerializer, ReviewSerializer,
+                          TitleSerializer, UserSerializer)
 
 User = get_user_model()
 
@@ -129,6 +128,11 @@ def auth_get_token(request):
     token = _get_token_for_user(user_object)
 
     output_data = EmailAuthTokenOutputSerializer(data={'token': token})
+    if not output_data.is_valid():
+        return response.Response(
+            output_data.errors,
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     return response.Response(output_data.data, status=status.HTTP_200_OK)
 
 
@@ -171,8 +175,45 @@ class CommentViewSet(viewsets.ModelViewSet):
             review=review
         )
 
-# !!!!!!не проходило тесты без этого
+
+class MixinSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    pass
+
+
+class CategoryViewSet(MixinSet):
+    queryset = Category.objects.all()
+    serializer_class = CategoriesSerializer
+    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
+    lookup_field = 'slug'
+
+
+class GenreViewSet(MixinSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
+    lookup_field = 'slug'
+
+
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score')) # нет уверенности в правильности
-    serializer_class = TitleSerializer
-# !!!!!!не проходило тесты без этого
+    queryset = Title.objects.all()
+    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_fields = ("category", "genre")
+    search_fields = ("name", "year")
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateTitleSerializer
+        return TitleSerializer
