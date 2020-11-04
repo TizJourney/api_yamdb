@@ -20,6 +20,7 @@ from .serializers import (CategoriesSerializer, CommentSerializer,
                           EmailAuthTokenOutputSerializer, GenreSerializer,
                           RestrictedUserSerializer, ReviewSerializer,
                           TitleSerializer, UserSerializer)
+from .filters import TitleFilter                        
 
 User = get_user_model()
 
@@ -210,8 +211,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ("category", "genre__slug")
-    search_fields = ("name", "year")
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         return (
