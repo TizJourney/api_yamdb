@@ -12,13 +12,13 @@ class AdminOnly(permissions.BasePermission):
         )
 
 
-class AdminOrReadOnly(permissions.BasePermission):
+class IsAdminOrReadOnly(permissions.BasePermission):
     """
-    Разрешение на уровне объекта, позволяющее только
+    Разрешение позволяющее только
     superuser и admin редактировать его.
     """
 
-    def has_object_permission(self, request, view, obj):
+    def has_permission(self, request, view):
         return (
                 request.method == 'GET' or
                 request.user.is_superuser or
