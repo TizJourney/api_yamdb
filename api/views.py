@@ -204,7 +204,7 @@ class MixinSet(
 class CategoryViewSet(MixinSet):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
@@ -214,7 +214,7 @@ class CategoryViewSet(MixinSet):
 class GenreViewSet(MixinSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
@@ -223,13 +223,15 @@ class GenreViewSet(MixinSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ("category", "genre")
+    filter_fields = ("category", "genre__slug")
     search_fields = ("name", "year")
 
     def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CreateTitleSerializer
-        return TitleSerializer
+        return (
+            TitleSerializer
+            if self.request.method in permissions.SAFE_METHODS
+            else CreateTitleSerializer
+        )
