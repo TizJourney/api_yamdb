@@ -29,7 +29,7 @@ from rest_framework.viewsets import ViewSetMixin, GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Category, Comment, Genre, Review, Title
-from .permissions import AdminOnly, IsAdminOrReadOnly
+from .permissions import AdminOnly, IsAdminOrReadOnly, IsUserOrModerator
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           CreateTitleSerializer, EmailAuthSerializer,
                           EmailAuthTokenInputSerializer,
