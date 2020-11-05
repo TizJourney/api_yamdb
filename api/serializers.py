@@ -106,7 +106,6 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    rating = serializers.IntegerField(read_only=True, required=False, default=0)
     genre = GenreSerializer(many=True, read_only=True)
     category = CategoriesSerializer(read_only=True)
 
