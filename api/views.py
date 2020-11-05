@@ -129,11 +129,6 @@ def auth_get_token(request):
     token = _get_token_for_user(user_object)
 
     output_data = EmailAuthTokenOutputSerializer(data={'token': token})
-    if not output_data.is_valid():
-        return response.Response(
-            output_data.errors,
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
     return response.Response(output_data.data, status=status.HTTP_200_OK)
 
 
@@ -176,12 +171,8 @@ class CommentViewSet(viewsets.ModelViewSet):
             review=review
         )
 
+# !!!!!!не проходило тесты без этого
 class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.annotate(rating=Avg('reviews__score')) # нет уверенности в правильности
     serializer_class = TitleSerializer
-
-    def get_queryset(self):
-        title = Title.objects.all().annotate(rating=Avg('reviews__score'))
-        return title
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+# !!!!!!не проходило тесты без этого

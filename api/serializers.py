@@ -90,42 +90,10 @@ class CommentSerializer(serializers.ModelSerializer):
         )
         model = models.Comment
 
-
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ['name', 'slug']
-        model = models.Genre
-        lookup_field = 'slug'
-
-
-class CategoriesSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ['name', 'slug']
-        model = models.Category
-        lookup_field = 'slug'
-
-
+# !!!!!!не проходило тесты без этого
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True, read_only=True)
-    category = CategoriesSerializer(read_only=True)
-
+    rating = serializers.IntegerField(read_only=True, required=False, default=0)
     class Meta:
         fields = '__all__'
         model = models.Title
-
-
-class CreateTitleSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(
-        queryset=models.Genre.objects.all(),
-        slug_field='slug',
-        many=True
-    )
-    category = serializers.SlugRelatedField(
-        queryset=models.Category.objects.all(),
-        slug_field='slug',
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = models.Title
-        read_only_fields = ['genre', 'category']
+# !!!!!!не проходило тесты без этого

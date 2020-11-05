@@ -25,7 +25,6 @@ TABLE_CONFIG = {
     'api_genre': 'genre',
 }
 
-
 def prepare_db_data(filename):
     with open(filename, 'r', encoding='utf8') as read_csv:
         # csv.DictReader использует первую строку в файле для header
@@ -53,13 +52,13 @@ def main(options):
         cur = con.cursor()
     else:
         print(f'Открываем базу {options.database}')
-
+    
     for key, filename in TABLE_CONFIG.items():
         print(f'Запуск скрипта для {key}')
         full_path = f'{options.data}/{filename}.csv'
         headers, data = prepare_db_data(full_path)
-        str_q = ','.join('?' * len(headers))
-
+        str_q =  ','.join('?' * len(headers))
+        
         # добавляем запись(INSERT) или пропускаем(IGNORE), если она уже есть в базе данных
         command = f'INSERT OR IGNORE INTO {key} {tuple(headers)} VALUES ({str_q})'
         if not options.dummy:
@@ -77,7 +76,6 @@ def main(options):
     else:
         print(f'Закрываем базу')
 
-
 def parse_arguments(args):
     parser = argparse.ArgumentParser(
         description='Скрипт для заливки данных в тестовую базу данных из csv файлов')
@@ -85,16 +83,12 @@ def parse_arguments(args):
     group.add_argument(
         '--dummy', help='Режим холостого запуска', action='store_true')
     parser.add_argument(
-        '--database',
-        help='Путь до базы данных для заливки данных. По умолчанию: db.sqlite3',
-        default='db.sqlite3')
+        '--database', help='Путь до базы данных для заливки данных. По умолчанию: db.sqlite3', default='db.sqlite3')
     parser.add_argument(
-        '-d', '--data',
-        help=f'Путь до данных с файлами. По умолчанию {BASE_DEFAULT_PATH}',
-        default=BASE_DEFAULT_PATH)
+        '-d', '--data', help=f'Путь до данных с файлами. По умолчанию {BASE_DEFAULT_PATH}', default=BASE_DEFAULT_PATH)
+
 
     return parser.parse_args()
-
 
 if __name__ == "__main__":
     options = parse_arguments(sys.argv)
