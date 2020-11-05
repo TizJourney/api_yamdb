@@ -5,13 +5,14 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (decorators, filters, permissions, response, status,
-                            viewsets, generics, mixins)
+from rest_framework import (decorators, filters, generics, mixins, permissions,
+                            response, status, viewsets)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ViewSetMixin, GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ViewSetMixin
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .filters import TitleFilter
 from .models import Category, Comment, Genre, Review, Title
 from .permissions import AdminOnly, IsAdminOrReadOnly
 from .serializers import (CategoriesSerializer, CommentSerializer,
@@ -38,8 +39,8 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, AdminOnly]
     lookup_field = 'username'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = (['username'])
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
 
     @decorators.action(
         detail=False,
@@ -117,7 +118,7 @@ def auth_get_token(request):
 
     if not token_generator.check_token(user_object, confirmation_code):
         return response.Response(
-            f'Неверный код подтверждения',
+            'Неверный код подтверждения',
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -199,9 +200,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ("category", "genre")
-    search_fields = ("name", "year")
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = TitleFilter
+    search_fields = ["name", "year"]
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:

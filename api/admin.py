@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Comment, Review, Title, Genre, Category
+from .models import Category, Comment, Genre, Review, Title
 
 User = get_user_model()
 

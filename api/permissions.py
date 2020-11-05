@@ -15,7 +15,7 @@ class AdminOnly(permissions.BasePermission):
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
     Разрешение позволяющее только
-    superuser и admin редактировать его.
+    superuser и admin использовать не безопасные методы.
     """
 
     def has_permission(self, request, view):
