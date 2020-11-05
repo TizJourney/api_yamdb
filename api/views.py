@@ -10,11 +10,7 @@ from .serializers import (
     ReviewSerializer,
     UserSerializer,
     RestrictedUserSerializer,
-<<<<<<< HEAD
-    TitleSerializer
-=======
     TitleSerializer,
->>>>>>> develop
 )
 from django.core.mail import send_mail
 from rest_framework import exceptions, response, status, permissions
