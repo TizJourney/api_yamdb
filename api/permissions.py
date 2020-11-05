@@ -22,5 +22,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return (
                 request.method == 'GET' or
                 request.user.is_superuser or
-                request.user.role == User.Role.ADMIN
+                (
+                        request.user.is_authenticated and
+                        request.user.role == User.Role.ADMIN
+                )
         )
