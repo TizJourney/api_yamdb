@@ -142,11 +142,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.reviews.all()
+    
+    def get_serializer_context(self):
+        return {
+            'title_id': self.kwargs['title_id'],
+            'request': self.request
+        }
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        if Review.objects.filter(author=self.request.user, title_id=title).exists():
-            raise exceptions.ValidationError('Отзыв уже существует')
         serializer.save(
             author=self.request.user,
             title=title
@@ -173,6 +177,6 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 # !!!!!!не проходило тесты без этого
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score')) # нет уверенности в правильности
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
 # !!!!!!не проходило тесты без этого

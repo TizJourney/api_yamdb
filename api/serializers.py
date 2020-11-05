@@ -63,6 +63,18 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username', read_only=True
     )
 
+    def validate(self, data):
+        title_id = self.context.get('title_id')
+        request = self.context.get('request')
+        if (
+            request.method != 'PATCH' and
+            models.Review.objects.filter(
+                author=request.user, title_id=title_id
+            ).exists()
+        ):
+            raise serializers.ValidationError('Отзыв уже существует')
+        return data
+
     class Meta:
         fields = (
             'id',
