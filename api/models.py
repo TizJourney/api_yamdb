@@ -1,8 +1,7 @@
-import uuid
-
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+import uuid
 
 
 class YamDBUser(AbstractUser):
@@ -54,8 +53,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=40, unique=True, null=True)
 
     def __str__(self):
-        category = f'Категория {self.name}'
-        return category
+        return self.name
 
 
 class Genre(models.Model):
@@ -63,15 +61,17 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=40, unique=True, null=True)
 
     def __str__(self):
-        genre = f'Жанр {self.name}'
-        return genre
+        return self.name
 
 
 class Title(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField()
     description = models.TextField(max_length=2000, blank=True, null=True)
-    genre = models.ManyToManyField(Genre, blank=True)
+    genre = models.ForeignKey(Genre, blank=True, null=True,
+                              on_delete=models.SET_NULL,
+                              verbose_name="Жанр",
+                              related_name="titles")
     category = models.ForeignKey(Category, blank=True, null=True,
                                  on_delete=models.SET_NULL,
                                  verbose_name="Категория",
