@@ -13,7 +13,7 @@ from .serializers import (
     TitleSerializer
 )
 from django.core.mail import send_mail
-from rest_framework import exceptions, response, status, permissions
+from rest_framework import response, status, permissions
 from smtplib import SMTPException
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import get_object_or_404
