@@ -53,16 +53,17 @@ def main(options):
         print(f'Запуск скрипта для {key}')
         full_path = f'{options.data}/{filename}.csv'
         headers, data = prepare_db_data(full_path)
+        str_q = ','.join('?' * len(headers))
 
         # добавляем запись(INSERT) или пропускаем(IGNORE),
         # если она уже есть в базе данных
-        command = f'INSERT OR IGNORE INTO {key} {tuple(headers)} VALUES ({str_q})'
+        com = f'INSERT OR IGNORE INTO {key} {tuple(headers)} VALUES ({str_q})'
         if not options.dummy:
-            cur.executemany(command, data)
+            cur.executemany(com, data)
         else:
             # поддержка режима холостого запуска
             # вместо запуска команд просто печатаем их на экран
-            print(command)
+            print(com)
             for item in data:
                 print(item)
 
