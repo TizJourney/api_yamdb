@@ -92,7 +92,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             'pub_date'
         )
         model = models.Review
-        extra_kwargs = {'title': {'required': False}}
 
 
 class CommentSerializer(serializers.ModelSerializer):
