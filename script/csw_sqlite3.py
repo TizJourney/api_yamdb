@@ -23,6 +23,7 @@ TABLE_CONFIG = {
     'api_comment': 'comments',
     'api_category': 'category',
     'api_genre': 'genre',
+    'api_title_genre': 'genre_title',
 }
 
 def prepare_db_data(filename):
