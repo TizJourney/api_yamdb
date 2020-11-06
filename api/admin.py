@@ -40,9 +40,12 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'year', 'description', 'category')
+    list_display = ('name', 'year', 'description', 'join_genres', 'category')
     search_fields = ('name', 'year', 'genre', 'category')
     list_filter = ('year', 'genre', 'category')
+
+    def join_genres(self, obj):
+        return ", ".join([str(g) for g in obj.genre.all()])
 
 
 class GenreAdmin(admin.ModelAdmin):
