@@ -1,14 +1,16 @@
 from smtplib import SMTPException
+
+from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (decorators, filters, mixins, permissions,
-                            response, status, viewsets)
+from rest_framework import (decorators, filters, mixins, permissions, response,
+                            status, viewsets)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.db.models import Avg
 
 from .filters import TitleFilter
 from .models import Category, Genre, Review, Title
@@ -19,7 +21,6 @@ from .serializers import (CategoriesSerializer, CommentSerializer,
                           EmailAuthTokenOutputSerializer, GenreSerializer,
                           RestrictedUserSerializer, ReviewSerializer,
                           TitleSerializer, UserSerializer)
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
