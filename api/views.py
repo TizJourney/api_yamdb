@@ -254,7 +254,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = TitleFilter
-    search_fields = ["name"]
+    search_fields = ['name']
 
     def get_serializer_class(self):
         """

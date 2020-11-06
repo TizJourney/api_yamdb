@@ -45,7 +45,7 @@ class TitleAdmin(admin.ModelAdmin):
     list_filter = ('year', 'genre', 'category')
 
     def join_genres(self, obj):
-        return ", ".join([str(g) for g in obj.genre.all()])
+        return ', '.join([str(g) for g in obj.genre.all()])
 
 
 class GenreAdmin(admin.ModelAdmin):
