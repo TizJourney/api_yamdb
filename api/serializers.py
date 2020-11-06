@@ -7,6 +7,17 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Сериализация пользователя
+    
+    Нельзя заводить пользователья с логином me.
+    Оно пересекается с названием endpoint'а.
+
+    Нельзя заводить имена с префикса, который использует робот
+    при автоматическом создании имён логинов
+
+    Добавлены новые поля bio, role
+    """
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError('Запрещено использовать имя me')
@@ -32,9 +43,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
 
 
-# специальный сериализатор с ограничениями на изменение полей:
-# нельзя менять роль
 class RestrictedUserSerializer(UserSerializer):
+    """
+    Сериализация для POST, PATCH методов
+    специальный сериализатор с ограничениями на изменение полей:
+    нельзя менять роль
+    """
+
     class Meta:
         fields = (
             'first_name',

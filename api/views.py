@@ -33,8 +33,14 @@ def _get_token_for_user(user):
 
 
 class UsersViewSet(viewsets.ModelViewSet):
-    # is_active: пользователи должны сначала пройти активацию через e-mail
-    # прежде, чем получат доступ в социальную сеть
+    """
+    viewset для работы с пользователями системы
+    [GET, POST, PATCH, DELETE].
+
+    Фильтр на is_active: пользователи должны сначала пройти активацию 
+    через e-mail прежде, чем получат доступ в социальную сеть
+    """
+
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, AdminOnly]
@@ -48,6 +54,11 @@ class UsersViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated]
     )
     def me(self, request, pk=None):
+        """
+        Специальная версия endpoint'а, которая отдаёт и редактирует
+        информацию для профиля текущего авторизованного пользователя.
+        """
+
         user_object = get_object_or_404(User, username=request.user.username)
         if request.method == 'GET':
             serializer = UserSerializer(user_object)
@@ -69,6 +80,15 @@ class UsersViewSet(viewsets.ModelViewSet):
 
 @decorators.api_view(['POST'])
 def auth_send_email(request):
+    """
+    Первая часть алгоритма создания пользователя.
+    Происходит создание неактивного пользователя.
+    Пользователю на заданный e-mail отправляется код подтверждения.
+
+    Так же этот endpoint может быть использован для повторого получания 
+    кода подтверждения. В этом случае статус пользователя не меняется.
+    """
+
     input_data = EmailAuthSerializer(data=request.data)
     if not input_data.is_valid():
         return response.Response(
@@ -105,6 +125,13 @@ def auth_send_email(request):
 
 @decorators.api_view(['POST'])
 def auth_get_token(request):
+    """
+    Вторая часть алгоритма создания пользователя.
+    По e-mail'у и коду подтверждения пользователь получает токен для
+    работы в системе. Так его учётная запись активируется.
+
+    Так же этот endpoint может быть использован для повторого получения токена.
+    """
     input_data = EmailAuthTokenInputSerializer(data=request.data)
     if not input_data.is_valid():
         return response.Response(
