@@ -25,6 +25,8 @@ class YamDBUser(AbstractUser):
     )
 
     class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
         ordering = ('-date_joined',)
 
     def __str__(self):
@@ -53,18 +55,25 @@ class Category(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=40, unique=True, null=True)
 
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
     def __str__(self):
-        category = f'Категория {self.name}'
-        return category
+        return self.name
+
 
 
 class Genre(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=40, unique=True, null=True)
 
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
     def __str__(self):
-        genre = f'Жанр {self.name}'
-        return genre
+        return self.name
 
 
 class Title(models.Model):
@@ -76,6 +85,11 @@ class Title(models.Model):
                                  on_delete=models.SET_NULL,
                                  verbose_name="Категория",
                                  related_name="titles")
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
+
 
     def __str__(self):
         title = f'Произведение {self.name}'
