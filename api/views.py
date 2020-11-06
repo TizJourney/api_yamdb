@@ -173,10 +173,18 @@ class MixinSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
+    """
+    Класс для наследования viewsets Category и Genre
+    реализющий [GET, POST, DELETE] запросы.
+    """
     pass
 
 
 class CategoryViewSet(MixinSet):
+    """
+    Viewset для работы с Categories
+    [GET, POST, DELETE].
+    """
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -187,6 +195,10 @@ class CategoryViewSet(MixinSet):
 
 
 class GenreViewSet(MixinSet):
+    """
+    Viewset для работы с Genres
+    [GET, POST, DELETE].
+    """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -197,14 +209,21 @@ class GenreViewSet(MixinSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """
+    viewset для работы с Titles
+    [GET, POST, PATCH, DELETE].
+    """
     queryset = Title.objects.all()
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = TitleFilter
-    search_fields = ["name", "year"]
+    search_fields = ["name"]
 
     def get_serializer_class(self):
+        """
+        Выбор необходимого сериализатора в зависмости от методов.
+        """
         if self.request.method in ['POST', 'PATCH']:
             return CreateTitleSerializer
         return TitleSerializer

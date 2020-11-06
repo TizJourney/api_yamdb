@@ -14,7 +14,7 @@ class AdminOnly(permissions.BasePermission):
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
-    Разрешение позволяющее только
+    Разрешение проверяет аутентификацию и позволяет только
     superuser и admin использовать не безопасные методы.
     """
 

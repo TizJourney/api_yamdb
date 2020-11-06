@@ -91,6 +91,9 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для GenreViewSet.
+    """
     class Meta:
         fields = ['name', 'slug']
         model = models.Genre
@@ -98,6 +101,9 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для CategoryViewSet.
+    """
     class Meta:
         fields = ['name', 'slug']
         model = models.Category
@@ -105,6 +111,9 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для SAFE_METHODS TitleViewSet.
+    """
     genre = GenreSerializer(many=True, read_only=True)
     category = CategoriesSerializer(read_only=True)
 
@@ -114,6 +123,9 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class CreateTitleSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для POST, PATCH методов TitleViewSet.
+    """
     genre = serializers.SlugRelatedField(
         queryset=models.Genre.objects.all(),
         slug_field='slug',

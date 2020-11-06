@@ -22,13 +22,11 @@ router.register(
 )
 
 v1_url_patterns = [
+    path('', include(router.urls)),
     path('auth/mail/', views.auth_send_email, name='auth_send_mail'),
     path('auth/token/', views.auth_get_token, name='auth_get_token'),
 ]
 
 urlpatterns = [
     path('v1/', include(v1_url_patterns)),
-    path('v1/', include(router.urls)),
-    # path('v1/genres/', views.GenreViewSet.as_view()),
-    # path('v1/categories/', views.CategoryViewSet.as_view()),
 ]
