@@ -5,15 +5,23 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (decorators, filters, permissions, response, status,
-                            viewsets, generics, mixins)
+from rest_framework import (decorators, filters, generics, mixins, permissions,
+                            response, status, viewsets)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ViewSetMixin, GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ViewSetMixin
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Avg
 
-from .models import Comment, Review, Title
+from .filters import TitleFilter
+from .models import Category, Comment, Genre, Review, Title
+from .permissions import AdminOnly, IsAdminOrReadOnly
+from .serializers import (CategoriesSerializer, CommentSerializer,
+                          CreateTitleSerializer, EmailAuthSerializer,
+                          EmailAuthTokenInputSerializer,
+                          EmailAuthTokenOutputSerializer, GenreSerializer,
+                          RestrictedUserSerializer, ReviewSerializer,
+                          TitleSerializer, UserSerializer)
 
 User = get_user_model()
 
@@ -32,8 +40,8 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, AdminOnly]
     lookup_field = 'username'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = (['username'])
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']
 
     @decorators.action(
         detail=False,
@@ -111,7 +119,7 @@ def auth_get_token(request):
 
     if not token_generator.check_token(user_object, confirmation_code):
         return response.Response(
-            f'Неверный код подтверждения',
+            'Неверный код подтверждения',
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -122,6 +130,11 @@ def auth_get_token(request):
     token = _get_token_for_user(user_object)
 
     output_data = EmailAuthTokenOutputSerializer(data={'token': token})
+    if not output_data.is_valid():
+        return response.Response(
+            output_data.errors,
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
     return response.Response(output_data.data, status=status.HTTP_200_OK)
 
 
@@ -164,8 +177,64 @@ class CommentViewSet(viewsets.ModelViewSet):
             review=review
         )
 
-# !!!!!!не проходило тесты без этого
+
+class MixinSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    """
+    Класс для наследования viewsets Category и Genre
+    реализющий [GET, POST, DELETE] запросы.
+    """
+    pass
+
+
+class CategoryViewSet(MixinSet):
+    """
+    Viewset для работы с Categories
+    [GET, POST, DELETE].
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategoriesSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
+    lookup_field = 'slug'
+
+
+class GenreViewSet(MixinSet):
+    """
+    Viewset для работы с Genres
+    [GET, POST, DELETE].
+    """
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
+    lookup_field = 'slug'
+
+
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score')) # нет уверенности в правильности
-    serializer_class = TitleSerializer
-# !!!!!!не проходило тесты без этого
+    """
+    viewset для работы с Titles
+    [GET, POST, PATCH, DELETE].
+    """
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = TitleFilter
+    search_fields = ["name"]
+
+    def get_serializer_class(self):
+        """
+        Выбор необходимого сериализатора в зависмости от методов.
+        """
+        if self.request.method in ['POST', 'PATCH']:
+            return CreateTitleSerializer
+        return TitleSerializer

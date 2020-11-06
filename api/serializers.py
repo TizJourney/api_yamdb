@@ -90,10 +90,55 @@ class CommentSerializer(serializers.ModelSerializer):
         )
         model = models.Comment
 
-# !!!!!!не проходило тесты без этого
+
+class GenreSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для GenreViewSet.
+    """
+    class Meta:
+        fields = ['name', 'slug']
+        model = models.Genre
+        lookup_field = 'slug'
+
+
+class CategoriesSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для CategoryViewSet.
+    """
+    class Meta:
+        fields = ['name', 'slug']
+        model = models.Category
+        lookup_field = 'slug'
+
+
 class TitleSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для SAFE_METHODS TitleViewSet.
+    """
     rating = serializers.IntegerField(read_only=True, required=False, default=0)
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategoriesSerializer(read_only=True)
+
     class Meta:
         fields = '__all__'
         model = models.Title
-# !!!!!!не проходило тесты без этого
+
+
+class CreateTitleSerializer(serializers.ModelSerializer):
+    """
+    Сериализация для POST, PATCH методов TitleViewSet.
+    """
+    genre = serializers.SlugRelatedField(
+        queryset=models.Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
+    category = serializers.SlugRelatedField(
+        queryset=models.Category.objects.all(),
+        slug_field='slug',
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = models.Title
+        read_only_fields = ['genre', 'category']
