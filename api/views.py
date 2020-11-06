@@ -1,19 +1,3 @@
-# from django.shortcuts import render
-# from django.contrib.auth import get_user_model
-# from django.db.models import Avg
-# from rest_framework import viewsets, decorators, filters    
-# from .serializers import (
-#     CommentSerializer,
-#     EmailAuthSerializer,
-#     EmailAuthTokenInputSerializer,
-#     EmailAuthTokenOutputSerializer,
-#     ReviewSerializer,
-#     UserSerializer,
-#     RestrictedUserSerializer,
-#     TitleSerializer
-# )
-# from django.core.mail import send_mail
-# from rest_framework import response, status, permissions
 from smtplib import SMTPException
 
 from django.contrib.auth import get_user_model
