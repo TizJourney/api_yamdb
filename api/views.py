@@ -1,18 +1,17 @@
 from smtplib import SMTPException
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (decorators, filters, generics, mixins, permissions,
+from rest_framework import (decorators, filters, mixins, permissions,
                             response, status, viewsets)
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import GenericViewSet, ViewSetMixin
+from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Avg
 
 from .filters import TitleFilter
-from .models import Category, Comment, Genre, Review, Title
+from .models import Category, Genre, Review, Title
 from .permissions import AdminOnly, IsAdminOrReadOnly, IsUserOrModerator
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           CreateTitleSerializer, EmailAuthSerializer,
@@ -20,7 +19,7 @@ from .serializers import (CategoriesSerializer, CommentSerializer,
                           EmailAuthTokenOutputSerializer, GenreSerializer,
                           RestrictedUserSerializer, ReviewSerializer,
                           TitleSerializer, UserSerializer)
-from django.contrib.auth import get_user_model                          
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -37,7 +36,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     viewset для работы с пользователями системы
     [GET, POST, PATCH, DELETE].
 
-    Фильтр на is_active: пользователи должны сначала пройти активацию 
+    Фильтр на is_active: пользователи должны сначала пройти активацию
     через e-mail прежде, чем получат доступ в социальную сеть
     """
 
@@ -85,7 +84,7 @@ def auth_send_email(request):
     Происходит создание неактивного пользователя.
     Пользователю на заданный e-mail отправляется код подтверждения.
 
-    Так же этот endpoint может быть использован для повторого получания 
+    Так же этот endpoint может быть использован для повторого получания
     кода подтверждения. В этом случае статус пользователя не меняется.
     """
 
@@ -181,7 +180,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         """
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.reviews.all()
-    
+
     def get_serializer_context(self):
         """
         Получение из context-а сериализатора полей title_id и request

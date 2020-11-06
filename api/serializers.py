@@ -9,7 +9,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     """
     Сериализация пользователя
-    
+
     Нельзя заводить пользователья с логином me.
     Оно пересекается с названием endpoint'а.
 
@@ -18,6 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     Добавлены новые поля bio, role
     """
+
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError('Запрещено использовать имя me')
@@ -152,7 +153,8 @@ class TitleSerializer(serializers.ModelSerializer):
     """
     Сериализация для SAFE_METHODS TitleViewSet.
     """
-    rating = serializers.IntegerField(read_only=True, required=False, default=0)
+    rating = serializers.IntegerField(
+        read_only=True, required=False, default=0)
     genre = GenreSerializer(many=True, read_only=True)
     category = CategoriesSerializer(read_only=True)
 

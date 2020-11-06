@@ -63,7 +63,6 @@ class Category(models.Model):
         return self.name
 
 
-
 class Genre(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=40, unique=True, null=True)
@@ -90,7 +89,6 @@ class Title(models.Model):
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
 
-
     def __str__(self):
         title = f'Произведение {self.name}'
         return title
@@ -109,7 +107,10 @@ class Review(models.Model):
                                db_column='author')
     score = models.PositiveIntegerField('Рейтинг',
                                         default=1,
-                                        validators=[MinValueValidator(1), MaxValueValidator(10)])
+                                        validators=[
+                                            MinValueValidator(1),
+                                            MaxValueValidator(10)
+                                        ])
     pub_date = models.DateTimeField('Дата публикации',
                                     auto_now_add=True)
 
