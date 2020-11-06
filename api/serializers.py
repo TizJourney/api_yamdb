@@ -60,9 +60,29 @@ class EmailAuthTokenOutputSerializer(serializers.Serializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для ReviewViewSet
+    """
     author = serializers.SlugRelatedField(
         slug_field='username', read_only=True
     )
+
+    def validate(self, data):
+        """
+        Валидация для проверки того,
+        был ли уже создан отзыв пользователя
+        на произведение
+        """
+        title_id = self.context.get('title_id')
+        request = self.context.get('request')
+        if (
+            request.method != 'PATCH' and
+            models.Review.objects.filter(
+                author=request.user, title_id=title_id
+            ).exists()
+        ):
+            raise serializers.ValidationError('Отзыв уже существует')
+        return data
 
     class Meta:
         fields = (
@@ -73,10 +93,12 @@ class ReviewSerializer(serializers.ModelSerializer):
             'pub_date'
         )
         model = models.Review
-        extra_kwargs = {'title': {'required': False}}
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для CommentViewSet
+    """
     author = serializers.SlugRelatedField(
         slug_field='username', read_only=True
     )

@@ -1,3 +1,19 @@
+# from django.shortcuts import render
+# from django.contrib.auth import get_user_model
+# from django.db.models import Avg
+# from rest_framework import viewsets, decorators, filters    
+# from .serializers import (
+#     CommentSerializer,
+#     EmailAuthSerializer,
+#     EmailAuthTokenInputSerializer,
+#     EmailAuthTokenOutputSerializer,
+#     ReviewSerializer,
+#     UserSerializer,
+#     RestrictedUserSerializer,
+#     TitleSerializer
+# )
+# from django.core.mail import send_mail
+# from rest_framework import response, status, permissions
 from smtplib import SMTPException
 
 from django.contrib.auth import get_user_model
@@ -15,7 +31,7 @@ from django.db.models import Avg
 
 from .filters import TitleFilter
 from .models import Category, Comment, Genre, Review, Title
-from .permissions import AdminOnly, IsAdminOrReadOnly
+from .permissions import AdminOnly, IsAdminOrReadOnly, IsUserOrModerator
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           CreateTitleSerializer, EmailAuthSerializer,
                           EmailAuthTokenInputSerializer,
@@ -139,6 +155,9 @@ def auth_get_token(request):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """
+    Viewset для работы с Review
+    """
     serializer_class = ReviewSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
@@ -146,13 +165,26 @@ class ReviewViewSet(viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
+        """
+        Viewset queryset всех reviews для title
+        """
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.reviews.all()
+    
+    def get_serializer_context(self):
+        """
+        Получение из context-а сериализатора полей title_id и request
+        """
+        return {
+            'title_id': self.kwargs['title_id'],
+            'request': self.request
+        }
 
     def perform_create(self, serializer):
+        """
+        Вызов CreateModelMixin
+        """
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        if Review.objects.filter(author=self.request.user, title_id=title).exists():
-            raise exceptions.ValidationError('Отзыв уже существует')
         serializer.save(
             author=self.request.user,
             title=title
@@ -160,6 +192,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """
+    Viewset для работы с Comment
+    """
     serializer_class = CommentSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
@@ -167,10 +202,16 @@ class CommentViewSet(viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
+        """
+        Возвращение queryset для всех комментариев к review
+        """
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
         return review.comments.all()
 
     def perform_create(self, serializer):
+        """
+        Вызов CreateModelMixin
+        """
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
         serializer.save(
             author=self.request.user,
