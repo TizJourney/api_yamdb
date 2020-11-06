@@ -59,11 +59,19 @@ class EmailAuthTokenOutputSerializer(serializers.Serializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для ReviewViewSet
+    """
     author = serializers.SlugRelatedField(
         slug_field='username', read_only=True
     )
 
     def validate(self, data):
+        """
+        Валидация для проверки того,
+        был ли уже создан отзыв пользователя
+        на произведение
+        """
         title_id = self.context.get('title_id')
         request = self.context.get('request')
         if (
@@ -88,6 +96,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для CommentViewSet
+    """
     author = serializers.SlugRelatedField(
         slug_field='username', read_only=True
     )
