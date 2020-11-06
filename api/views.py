@@ -43,15 +43,15 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, AdminOnly]
+    permission_classes = (permissions.IsAuthenticated, AdminOnly)
     lookup_field = 'username'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['username']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
 
     @decorators.action(
         detail=False,
-        methods=['get', 'patch'],
-        permission_classes=[permissions.IsAuthenticated]
+        methods=('get', 'patch'),
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def me(self, request, pk=None):
         """
@@ -170,10 +170,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
     Viewset для работы с Review
     """
     serializer_class = ReviewSerializer
-    permission_classes = [
+    permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsUserOrModerator
-    ]
+    )
 
     def get_queryset(self):
         """
@@ -207,10 +207,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     Viewset для работы с Comment
     """
     serializer_class = CommentSerializer
-    permission_classes = [
+    permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsUserOrModerator
-    ]
+    )
 
     def get_queryset(self):
         """
@@ -250,10 +250,10 @@ class CategoryViewSet(MixinSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
     lookup_field = 'slug'
 
 
@@ -264,10 +264,10 @@ class GenreViewSet(MixinSet):
     """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
     lookup_field = 'slug'
 
 
@@ -277,16 +277,16 @@ class TitleViewSet(viewsets.ModelViewSet):
     [GET, POST, PATCH, DELETE].
     """
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_class = TitleFilter
-    search_fields = ['name']
+    search_fields = ('name',)
 
     def get_serializer_class(self):
         """
-        Выбор необходимого сериализатора в зависмости от методов.
+        Выбор необходимого сериализатора в зависимости от методов.
         """
-        if self.request.method in ['POST', 'PATCH']:
+        if self.request.method in ('POST', 'PATCH'):
             return CreateTitleSerializer
         return TitleSerializer

@@ -134,7 +134,7 @@ class GenreSerializer(serializers.ModelSerializer):
     Сериализация для GenreViewSet.
     """
     class Meta:
-        fields = ['name', 'slug']
+        fields = ('name', 'slug')
         model = models.Genre
         lookup_field = 'slug'
 
@@ -144,7 +144,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
     Сериализация для CategoryViewSet.
     """
     class Meta:
-        fields = ['name', 'slug']
+        fields = ('name', 'slug')
         model = models.Category
         lookup_field = 'slug'
 
@@ -180,4 +180,4 @@ class CreateTitleSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = models.Title
-        read_only_fields = ['genre', 'category']
+        read_only_fields = ('genre', 'category')
