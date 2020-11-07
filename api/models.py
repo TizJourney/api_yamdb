@@ -106,29 +106,30 @@ class Title(models.Model):
 
 
 class Review(models.Model):
+    validat = (
+        MinValueValidator(1),
+        MaxValueValidator(10, message='Оценка должна быть меньше 10')
+    )
     title = models.ForeignKey(Title,
                               on_delete=models.CASCADE,
                               related_name='reviews',
                               verbose_name='Произведение')
-    text = models.TextField('Текст отзыва')
+    text = models.TextField(verbose_name='Текст отзыва')
     author = models.ForeignKey(YamDBUser,
                                on_delete=models.CASCADE,
                                related_name='reviews',
                                verbose_name='Автор',
                                db_column='author')
-    score = models.PositiveIntegerField('Рейтинг',
-                                        default=1,
-                                        validators=(
-                                            MinValueValidator(1),
-                                            MaxValueValidator(10)
-                                        ))
-    pub_date = models.DateTimeField('Дата публикации',
-                                    auto_now_add=True)
+    score = models.PositiveSmallIntegerField(verbose_name='Рейтинг',
+                                              default=1,
+                                              validators=validat)
+    pub_date = models.DateTimeField(verbose_name='Дата публикации',
+                                    auto_now_add=True,
+                                    db_index=True)
 
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ('-pub_date',)
 
     def __str__(self):
         review = f'Отзыв {self.author} на {self.title}'
@@ -140,19 +141,19 @@ class Comment(models.Model):
                                on_delete=models.CASCADE,
                                related_name='comments',
                                verbose_name='Отзыв')
-    text = models.TextField('Текст комментария')
+    text = models.TextField(verbose_name='Текст комментария')
     author = models.ForeignKey(YamDBUser,
                                on_delete=models.CASCADE,
                                related_name='comments',
                                verbose_name='Автор',
                                db_column='author')
-    pub_date = models.DateTimeField('Дата добавления',
-                                    auto_now_add=True)
+    pub_date = models.DateTimeField(verbose_name='Дата добавления',
+                                    auto_now_add=True,
+                                    db_index=True)
 
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ('-pub_date',)
 
     def __str__(self):
         fragment = str(self.text)[:20]
