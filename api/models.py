@@ -24,6 +24,14 @@ class YamDBUser(AbstractUser):
         default=Role.USER,
     )
 
+    @property
+    def is_admin(self):
+        return self.is_superuser or (self.role == self.Role.ADMIN)
+
+    @property
+    def is_moderator(self):
+        return self.role == self.Role.MODERATOR
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
