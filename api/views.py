@@ -21,6 +21,7 @@ from .serializers import (CategoriesSerializer, CommentSerializer,
                           EmailAuthTokenOutputSerializer, GenreSerializer,
                           RestrictedUserSerializer, ReviewSerializer,
                           TitleSerializer, UserSerializer)
+from django.conf import settings
 
 User = get_user_model()
 
@@ -110,7 +111,7 @@ def auth_send_email(request):
         send_mail(
             'Получение доступа к социальной сети YamDB',
             f'Ваш код активации: {confirmation_code}',
-            None,  # from: использовать DEFAULT_FROM_EMAIL
+            settings.DEFAULT_FROM_EMAIL,
             [email],
             fail_silently=False,
         )
