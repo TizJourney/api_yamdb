@@ -106,7 +106,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             'text',
             'author',
             'score',
-            'pub_date'
+            'pub_date',
         )
         model = models.Review
 
@@ -124,7 +124,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'id',
             'text',
             'author',
-            'pub_date'
+            'pub_date',
         )
         model = models.Comment
 
