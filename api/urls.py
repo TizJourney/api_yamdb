@@ -19,10 +19,15 @@ router.register(
     basename='comments'
 )
 
+auth_url_patterns = [
+    path('mail/', views.auth_send_email, name='auth_send_mail'),
+    path('token/', views.auth_get_token, name='auth_get_token'),
+]
+
+
 v1_url_patterns = [
     path('', include(router.urls)),
-    path('auth/mail/', views.auth_send_email, name='auth_send_mail'),
-    path('auth/token/', views.auth_get_token, name='auth_get_token'),
+    path('auth/', include(auth_url_patterns)),
 ]
 
 urlpatterns = [
