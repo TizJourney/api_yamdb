@@ -70,11 +70,7 @@ class UsersViewSet(viewsets.ModelViewSet):
             data=request.data,
             partial=True
         )
-        if not serializer.is_valid():
-            return response.Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Response(serializer.data)
 
@@ -91,12 +87,7 @@ def auth_send_email(request):
     """
 
     input_data = EmailAuthSerializer(data=request.data)
-    if not input_data.is_valid():
-        return response.Response(
-            input_data.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
+    input_data.is_valid(raise_exception=True)
     email = input_data.validated_data['email']
 
     user_object, created = User.objects.get_or_create(email=email)
@@ -134,11 +125,7 @@ def auth_get_token(request):
     Так же этот endpoint может быть использован для повторого получения токена.
     """
     input_data = EmailAuthTokenInputSerializer(data=request.data)
-    if not input_data.is_valid():
-        return response.Response(
-            input_data.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    input_data.is_valid(raise_exception=True)
     email = input_data.validated_data['email']
     confirmation_code = input_data.validated_data['confirmation_code']
 
@@ -157,12 +144,7 @@ def auth_get_token(request):
     token = _get_token_for_user(user_object)
 
     output_data = EmailAuthTokenOutputSerializer(data={'token': token})
-    if not output_data.is_valid():
-        return response.Response(
-            output_data.errors,
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
+    output_data.is_valid(raise_exception=True)
     return response.Response(output_data.data, status=status.HTTP_200_OK)
 
 
