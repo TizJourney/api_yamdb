@@ -6,12 +6,15 @@ from django.db import models
 
 
 class YamDBUser(AbstractUser):
-    class Role(models.TextChoices):
-        USER = 'user', 'Пользователь'
-        MODERATOR = 'moderator', 'Модератор'
-        ADMIN = 'admin', 'Администратор'
-
-    ROLE_MAX_LENGTH = max((len(c[0]) for c in Role.choices))
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+    ROLE_CHOICES = [
+        (USER, 'Пользователь'),
+        (MODERATOR, 'Модератор'),
+        (ADMIN, 'Администратор'),
+    ]
+    ROLE_MAX_LENGTH = max((len(c[0]) for c in ROLE_CHOICES))
     AUTO_CREATE_USERNAME_PREFIX = 'yamdbuser-'
 
     # нельзя заводить с пустой почтой
@@ -20,17 +23,17 @@ class YamDBUser(AbstractUser):
     bio = models.TextField(blank=True)
     role = models.CharField(
         max_length=ROLE_MAX_LENGTH,
-        choices=Role.choices,
-        default=Role.USER,
+        choices=ROLE_CHOICES,
+        default=USER,
     )
 
     @property
     def is_admin(self):
-        return self.is_superuser or (self.role == self.Role.ADMIN)
+        return self.is_superuser or (self.role == self.ADMIN)
 
     @property
     def is_moderator(self):
-        return self.role == self.Role.MODERATOR
+        return self.role == self.MODERATOR
 
     class Meta:
         verbose_name = 'Пользователь'
