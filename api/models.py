@@ -112,8 +112,8 @@ class Title(models.Model):
 
 class Review(models.Model):
     validat = (
-        MinValueValidator(1),
-        MaxValueValidator(10, message='Оценка должна быть меньше 10')
+        MinValueValidator(1, message='Оценка должна быть не меньше 1'),
+        MaxValueValidator(10, message='Оценка должна быть не больше 10')
     )
     title = models.ForeignKey(Title,
                               on_delete=models.CASCADE,
