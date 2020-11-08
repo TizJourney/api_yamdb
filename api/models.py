@@ -3,6 +3,7 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from datetime import datetime
 
 
 class YamDBUser(AbstractUser):
@@ -88,7 +89,12 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=200)
-    year = models.IntegerField()
+    year = models.IntegerField(db_index=True,
+                               validators=(
+                                   MinValueValidator(0),
+                                   MaxValueValidator(
+                                       datetime.now().year)
+                               ))
     description = models.TextField(max_length=2000, blank=True, null=True)
     genre = models.ManyToManyField(Genre, blank=True)
     category = models.ForeignKey(Category, blank=True, null=True,
