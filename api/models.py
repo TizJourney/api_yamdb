@@ -12,9 +12,9 @@ class YamDBUser(AbstractUser):
         MODERATOR = 'moderator'
         ADMIN = 'admin'
 
-    # сделали резерв на 20 символов, чтобы избегать частых миграций базы данных
-    # при добавалении новый ролей
-    ROLE_MAX_LENGTH = min(20, max((len(c[0]) for c in Role.choices)))
+    # сделали резерв на 150 символов, чтобы избегать частых миграций базы
+    # данных при добавалении новый ролей
+    ROLE_MAX_LENGTH = min(150, max((len(c[0]) for c in Role.choices)))
     AUTO_CREATE_USERNAME_PREFIX = 'yamdbuser-'
 
     # нельзя заводить с пустой почтой
